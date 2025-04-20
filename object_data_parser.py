@@ -1,3 +1,4 @@
+import webbrowser
 import folium
 
 
@@ -229,4 +230,6 @@ if __name__ == "__main__":
     obstacles = parse_dof_file(dof_filename)
 
     create_obstacle_map(obstacles, "obstacles_map.html")
+    
+    webbrowser.open("obstacles_map.html", new=2)  # open in new tab
 
