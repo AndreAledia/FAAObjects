@@ -47,7 +47,7 @@ function records = parse_dof_file(filename)
         
         % Increment the counter and print progress
         line_count = line_count + 1;
-        fprintf('Processed line %d\n', line_count);
+        fprintf('Processed line %d: Appended record to index %d\n', line_count, length(records));
     end
     
     fclose(fid);
