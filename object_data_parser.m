@@ -26,6 +26,8 @@ function records = parse_dof_file(filename)
         fgetl(fid);
     end
     
+    line_count = 0; % Initialize a counter to track processed lines
+    
     while ~feof(fid)
         line = fgetl(fid);
         
@@ -42,6 +44,10 @@ function records = parse_dof_file(filename)
         % Parse the line
         record = parse_dof_line(line);
         records = [records; record]; %#ok<AGROW>
+        
+        % Increment the counter and print progress
+        line_count = line_count + 1;
+        fprintf('Processed line %d\n', line_count);
     end
     
     fclose(fid);
