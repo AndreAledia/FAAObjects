@@ -8,9 +8,6 @@ function object_data_parser(p_lat, p_lon, a_agl)
     % Parse the DOF file
     obstacles = parse_dof_file(dof_filename);
     
-    % Plot the path of the plane
-    plot_plane_path(p_lat, p_lon);
-    
     % Create the obstacle map
     create_obstacle_map(obstacles, p_lat, p_lon, a_agl);
 end
