@@ -181,12 +181,16 @@ def create_obstacle_map(obstacle_data, map_filename="obstacles_map.html"):
     """
     Takes a list of DOF obstacle records (dicts) and plots them on a folium map.
     Saves the interactive map to 'obstacles_map.html' by default.
+    Filters obstacles to include only those within specified latitude and longitude bounds.
     """
     # You can choose a default start location (e.g., continental US)
     obstacle_map = folium.Map(location=[37.8283, -121.5795], zoom_start=5)
 
+    # Define latitude and longitude bounds
+    lat_min, lat_max = 36, 40
+    lon_min, lon_max = -124, -120
+
     for obs in obstacle_data:
-        print(obs)
         # Convert lat/lon from DMS -> decimal
         lat = dms_to_decimal_degrees(
             obs["lat_deg"], obs["lat_min"], obs["lat_sec"], obs["lat_hem"]
@@ -195,8 +199,8 @@ def create_obstacle_map(obstacle_data, map_filename="obstacles_map.html"):
             obs["lon_deg"], obs["lon_min"], obs["lon_sec"], obs["lon_hem"]
         )
 
-        # Some lines in the DOF might have missing or invalid lat/lon, so skip if lat/lon is 0
-        if lat == 0 and lon == 0:
+        # Filter objects outside the specified bounds
+        if not (lat_min <= lat <= lat_max and lon_min <= lon <= lon_max):
             continue
 
         # Create a marker. Use obstacle_number + obstacle_type for label/tooltip
