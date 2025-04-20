@@ -108,36 +108,62 @@ function create_obstacle_map(obstacles)
     % Plots obstacles on a MATLAB map using geoscatter
     lat_min = 36; lat_max = 40;
     lon_min = -124; lon_max = -120;
-    
+
     lats = [];
     lons = [];
     labels = {};
-    
+
+    % Assume p_lat, p_long, and a_agl are defined elsewhere and are arrays
+    % p_lat: Array of latitude points
+    % p_long: Array of longitude points
+    % a_agl: Array of reference heights above ground level (AGL)
+
+    radius = 0.5; % Flat radius in degrees (approx. 30-40 miles depending on latitude)
+
     for i = 1:length(obstacles)
         obs = obstacles(i);
-        
+
         % Convert lat/lon from DMS to decimal degrees
         lat = dms_to_decimal(obs.lat_deg, obs.lat_min, obs.lat_sec, obs.lat_hem);
         lon = dms_to_decimal(obs.lon_deg, obs.lon_min, obs.lon_sec, obs.lon_hem);
-        
+
         % Filter objects outside the specified bounds
         if lat < lat_min || lat > lat_max || lon < lon_min || lon > lon_max
             continue;
         end
-        
+
+        % Check against all p_lat, p_long, and a_agl values
+        is_within_radius = false;
+        for j = 1:length(p_lat)
+            % Check if the object is within the flat radius
+            if sqrt((lat - p_lat(j))^2 + (lon - p_long(j))^2) <= radius
+                % Check if the height difference is less than 500 feet
+                if abs(obs.agl_height - a_agl(j)) < 500
+                    is_within_radius = true;
+                    break;
+                end
+            end
+        end
+
+        % Skip the object if it doesn't meet the criteria
+        if ~is_within_radius
+            continue;
+        end
+
+        % Add the object to the map
         lats = [lats; lat]; %#ok<AGROW>
         lons = [lons; lon]; %#ok<AGROW>
         labels{end+1} = sprintf('OAS#%s-%s\nType: %s\nCity: %s\nAGL: %d ft\nAMSL: %d ft', ...
             obs.oas_code, obs.obstacle_number, obs.obstacle_type, obs.city_name, ...
             obs.agl_height, obs.amsl_height); %#ok<AGROW>
     end
-    
+
     % Plot the data on a geographic map
     figure;
     ax = geoaxes; % Create a GeographicAxes object
     geoscatter(ax, lats, lons, 50, 'r', 'filled');
     title('Obstacle Map');
-    
+
     % Add labels to the points
     for i = 1:length(lats)
         text(ax, lons(i), lats(i), labels{i}, 'FontSize', 8);
