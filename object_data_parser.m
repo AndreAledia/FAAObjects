@@ -193,7 +193,12 @@ function create_obstacle_map(obstacles, p_lat, p_lon, a_agl)
     scatter_points.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('Height (AGL)', arrayfun(@(x) x.agl_height, obstacles));
 
     % Plot the plane's path
-    geoplot(ax, p_lat, p_lon, '-o', 'LineWidth', 2, 'MarkerSize', 5, 'Color', "g"); % Path in green
+    path_plot = geoplot(ax, p_lat, p_lon, '-o', 'LineWidth', 2, 'MarkerSize', 5, 'Color', "g"); % Path in green
+
+    % Add tooltips to the plane's path
+    path_plot.DataTipTemplate.DataTipRows(1).Label = 'Latitude';
+    path_plot.DataTipTemplate.DataTipRows(2).Label = 'Longitude';
+    path_plot.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('Altitude (AGL)', a_agl);
 
     % Add labels and title
     title('Obstacle Map with Plane Path');
