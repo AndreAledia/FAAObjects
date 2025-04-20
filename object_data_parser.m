@@ -134,7 +134,7 @@ function decimal = dms_to_decimal(deg, min, sec, hemisphere)
 end
 
 function create_obstacle_map(obstacles, p_lat, p_lon, a_agl)
-    % Plots obstacles on a MATLAB map using geoscatter
+    % Plots obstacles and the plane's path on a MATLAB map using geoscatter
     lat_min = 36; lat_max = 40;
     lon_min = -124; lon_max = -120;
 
@@ -142,7 +142,7 @@ function create_obstacle_map(obstacles, p_lat, p_lon, a_agl)
     lons = [];
     labels = {};
 
-    radius = 0.02; % Flat radius in degrees (approx. 30-40 miles depending on latitude)
+    radius = 0.1; % Flat radius in degrees (approx. 30-40 miles depending on latitude)
 
     for i = 1:length(obstacles)
         obs = obstacles(i);
@@ -185,11 +185,27 @@ function create_obstacle_map(obstacles, p_lat, p_lon, a_agl)
     % Plot the data on a geographic map
     figure;
     ax = geoaxes; % Create a GeographicAxes object
-    geoscatter(ax, lats, lons, 50, 'r', 'filled');
-    title('Obstacle Map');
 
-    % Add labels to the points
+    % Plot obstacles
+    geoscatter(ax, lats, lons, 50, 'r', 'filled'); % Obstacles in red
+    hold on;
+
+    % Plot the plane's path
+    geoplot(ax, p_lat, p_lon, '-o', 'LineWidth', 2, 'MarkerSize', 5, 'Color', "g"); % Path in green
+
+    % Add labels and title
+    title('Obstacle Map with Plane Path');
+
+    % Add labels to the obstacle points
     for i = 1:length(lats)
         text(ax, lons(i), lats(i), labels{i}, 'FontSize', 8);
     end
+
+    % Adjust the view to ensure all data is visible
+    geolimits([min([lats; p_lat]) - 0.01, max([lats; p_lat]) + 0.01], ...
+              [min([lons; p_lon]) - 0.01, max([lons; p_lon]) + 0.01]);
+
+    % Display grid for better visual reference
+    grid on;
+    hold off;
 end
