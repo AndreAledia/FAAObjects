@@ -8,8 +8,37 @@ function object_data_parser(p_lat, p_lon, a_agl)
     % Parse the DOF file
     obstacles = parse_dof_file(dof_filename);
     
+    % Plot the path of the plane
+    plot_plane_path(p_lat, p_lon);
+    
     % Create the obstacle map
     create_obstacle_map(obstacles, p_lat, p_lon, a_agl);
+end
+
+function plot_plane_path(p_lat, p_lon)
+    % Plots the path of the plane on a geographic map
+    latitudes = p_lat;
+    longitudes = p_lon;
+
+    % Check if the number of latitude and longitude data points match
+    if height(latitudes) ~= height(longitudes)
+        error('The number of latitude and longitude points must match.');
+    end
+
+    % Create a geographic plot
+    figure;
+    geoplot(latitudes, longitudes, '-o', 'LineWidth', 2, 'MarkerSize', 5, 'Color', "g"); % Path in green
+    geobasemap('satellite'); % Set the basemap to satellite
+
+    % Add labels and title
+    title('Path of the Plane');
+
+    % Adjust the view to ensure the entire path is visible
+    geolimits([min(latitudes) - 0.01, max(latitudes) + 0.01], ...
+              [min(longitudes) - 0.01, max(longitudes) + 0.01]);
+
+    % Display grid for better visual reference
+    grid on;
 end
 
 function records = parse_dof_file(filename)
@@ -113,7 +142,7 @@ function create_obstacle_map(obstacles, p_lat, p_lon, a_agl)
     lons = [];
     labels = {};
 
-    radius = 0.5; % Flat radius in degrees (approx. 30-40 miles depending on latitude)
+    radius = 0.02; % Flat radius in degrees (approx. 30-40 miles depending on latitude)
 
     for i = 1:length(obstacles)
         obs = obstacles(i);
