@@ -48,9 +48,25 @@ function records = parse_dof_file(filename)
         % Increment the counter and print progress
         line_count = line_count + 1;
         fprintf('Processed line %d: Appended record to index %d\n', line_count, length(records));
+        fprintf('Record appended: %s\n', struct2str(record)); % Print the record value
     end
     
     fclose(fid);
+end
+
+function str = struct2str(s)
+    % Converts a struct to a string for display
+    fields = fieldnames(s);
+    str = '';
+    for i = 1:length(fields)
+        field = fields{i};
+        value = s.(field);
+        if isnumeric(value)
+            value = num2str(value);
+        end
+        str = [str, sprintf('%s: %s, ', field, value)]; %#ok<AGROW>
+    end
+    str = str(1:end-2); % Remove trailing comma and space
 end
 
 function record = parse_dof_line(line)
