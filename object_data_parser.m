@@ -1,5 +1,5 @@
 % filepath: d:\Repos\FAAObjects\object_data_parser.m
-function object_data_parser()
+function object_data_parser(p_lat, p_long, a_agl)
     % Main function to parse DOF file and plot obstacles on a MATLAB map
 
     % Replace with the actual path to your DOF file
@@ -9,7 +9,7 @@ function object_data_parser()
     obstacles = parse_dof_file(dof_filename);
     
     % Create the obstacle map
-    create_obstacle_map(obstacles);
+    create_obstacle_map(obstacles, p_lat, p_long, a_agl);
 end
 
 function records = parse_dof_file(filename)
@@ -104,7 +104,7 @@ function decimal = dms_to_decimal(deg, min, sec, hemisphere)
     end
 end
 
-function create_obstacle_map(obstacles)
+function create_obstacle_map(obstacles, p_lat, p_long, a_agl)
     % Plots obstacles on a MATLAB map using geoscatter
     lat_min = 36; lat_max = 40;
     lon_min = -124; lon_max = -120;
@@ -112,16 +112,6 @@ function create_obstacle_map(obstacles)
     lats = [];
     lons = [];
     labels = {};
-
-    latitudes = p_lat;
-    longitudes = p_long;
-    heights = a_agl;
-
-
-    % Assume latitudes, longitudes, and heights are defined elsewhere and are arrays
-    % latitudes: Array of latitude points
-    % longitudes: Array of longitude points
-    % heights: Array of reference heights above ground level (AGL)
 
     radius = 0.5; % Flat radius in degrees (approx. 30-40 miles depending on latitude)
 
@@ -137,13 +127,13 @@ function create_obstacle_map(obstacles)
             continue;
         end
 
-        % Check against all latitudes, longitudes, and heights values
+        % Check against all p_lat, p_long, and a_agl values
         is_within_radius = false;
-        for j = 1:length(latitudes)
+        for j = 1:length(p_lat)
             % Check if the object is within the flat radius
-            if sqrt((lat - latitudes(j))^2 + (lon - longitudes(j))^2) <= radius
+            if sqrt((lat - p_lat(j))^2 + (lon - p_long(j))^2) <= radius
                 % Check if the height difference is less than 500 feet
-                if abs(obs.agl_height - heights(j)) < 500
+                if abs(obs.agl_height - a_agl(j)) < 500
                     is_within_radius = true;
                     break;
                 end
