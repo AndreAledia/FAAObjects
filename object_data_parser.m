@@ -132,14 +132,14 @@ function create_obstacle_map(obstacles)
             obs.agl_height, obs.amsl_height); %#ok<AGROW>
     end
     
-    % Plot the data on a map
+    % Plot the data on a geographic map
     figure;
-    worldmap([lat_min lat_max], [lon_min lon_max]);
-    geoscatter(lats, lons, 50, 'r', 'filled');
+    ax = geoaxes; % Create a GeographicAxes object
+    geoscatter(ax, lats, lons, 50, 'r', 'filled');
     title('Obstacle Map');
     
     % Add labels to the points
     for i = 1:length(lats)
-        textm(lats(i), lons(i), labels{i}, 'FontSize', 8);
+        text(ax, lons(i), lats(i), labels{i}, 'FontSize', 8);
     end
 end
