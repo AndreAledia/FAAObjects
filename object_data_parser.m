@@ -15,43 +15,37 @@ end
 function records = parse_dof_file(filename)
     % Reads a DOF file and returns a struct array of obstacle data
     fid = fopen(filename, 'r');
-    records = [];
-    
     if fid == -1
         error('Could not open file: %s', filename);
     end
     
+    % Read all lines into memory
+    lines = textscan(fid, '%s', 'Delimiter', '\n');
+    fclose(fid);
+    lines = lines{1};
+    
     % Skip header lines (first 4 lines)
-    for i = 1:4
-        fgetl(fid);
-    end
+    lines = lines(5:end);
     
-    line_count = 0; % Initialize a counter to track processed lines
+    % Preallocate a cell array for parallel processing
+    num_lines = length(lines);
+    parsed_records = cell(num_lines, 1);
     
-    while ~feof(fid)
-        line = fgetl(fid);
+    % Start parallel processing
+    parfor i = 1:num_lines
+        line = lines{i};
         
         % Skip empty lines or lines that are too short to be data
-        if isempty(line) || length(line) < 80
-            continue;
-        end
-        
-        % Skip lines made up only of dashes
-        if all(line == '-')
+        if isempty(line) || length(line) < 80 || all(line == '-')
             continue;
         end
         
         % Parse the line
-        record = parse_dof_line(line);
-        records = [records; record]; %#ok<AGROW>
-        
-        % Increment the counter and print progress
-        line_count = line_count + 1;
-        fprintf('Processed line %d: Appended record to index %d\n', line_count, length(records));
-        fprintf('Record appended: %s\n', struct2str(record)); % Print the record value
+        parsed_records{i} = parse_dof_line(line);
     end
     
-    fclose(fid);
+    % Combine non-empty results into a single struct array
+    records = [parsed_records{:}];
 end
 
 function str = struct2str(s)
