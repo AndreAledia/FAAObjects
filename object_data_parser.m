@@ -184,8 +184,13 @@ function create_obstacle_map(obstacles, p_lat, p_lon, a_agl)
     ax = geoaxes; % Create a GeographicAxes object
 
     % Plot obstacles
-    geoscatter(ax, lats, lons, 50, 'r', 'filled'); % Obstacles in red
+    scatter_points = geoscatter(ax, lats, lons, 50, 'r', 'filled'); % Obstacles in red
     hold on;
+
+    % Add tooltips to obstacle points
+    scatter_points.DataTipTemplate.DataTipRows(1).Label = 'Latitude';
+    scatter_points.DataTipTemplate.DataTipRows(2).Label = 'Longitude';
+    scatter_points.DataTipTemplate.DataTipRows(end+1) = dataTipTextRow('Height (AGL)', arrayfun(@(x) x.agl_height, obstacles));
 
     % Plot the plane's path
     geoplot(ax, p_lat, p_lon, '-o', 'LineWidth', 2, 'MarkerSize', 5, 'Color', "g"); % Path in green
