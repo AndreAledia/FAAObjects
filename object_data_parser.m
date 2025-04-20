@@ -1,5 +1,5 @@
 % filepath: d:\Repos\FAAObjects\object_data_parser.m
-function object_data_parser(p_lat, p_long, a_agl)
+function object_data_parser(p_lat, p_lon, a_agl)
     % Main function to parse DOF file and plot obstacles on a MATLAB map
 
     % Replace with the actual path to your DOF file
@@ -9,7 +9,7 @@ function object_data_parser(p_lat, p_long, a_agl)
     obstacles = parse_dof_file(dof_filename);
     
     % Create the obstacle map
-    create_obstacle_map(obstacles, p_lat, p_long, a_agl);
+    create_obstacle_map(obstacles, p_lat, p_lon, a_agl);
 end
 
 function records = parse_dof_file(filename)
@@ -104,7 +104,7 @@ function decimal = dms_to_decimal(deg, min, sec, hemisphere)
     end
 end
 
-function create_obstacle_map(obstacles, p_lat, p_long, a_agl)
+function create_obstacle_map(obstacles, p_lat, p_lon, a_agl)
     % Plots obstacles on a MATLAB map using geoscatter
     lat_min = 36; lat_max = 40;
     lon_min = -124; lon_max = -120;
@@ -127,11 +127,11 @@ function create_obstacle_map(obstacles, p_lat, p_long, a_agl)
             continue;
         end
 
-        % Check against all p_lat, p_long, and a_agl values
+        % Check against all p_lat, p_lon, and a_agl values
         is_within_radius = false;
         for j = 1:length(p_lat)
             % Check if the object is within the flat radius
-            if sqrt((lat - p_lat(j))^2 + (lon - p_long(j))^2) <= radius
+            if sqrt((lat - p_lat(j))^2 + (lon - p_lon(j))^2) <= radius
                 % Check if the height difference is less than 500 feet
                 if abs(obs.agl_height - a_agl(j)) < 500
                     is_within_radius = true;
