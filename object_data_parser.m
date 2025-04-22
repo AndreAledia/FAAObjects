@@ -1,5 +1,5 @@
-% filepath: d:\Repos\FAAObjects\object_data_parser.m
-function object_data_parser(p_lat, p_lon, a_agl)
+% filepath: d:\Repos\FAAObjects\dof_object_data_parser.m
+function dof_object_data_parser(p_lat, p_lon, a_agl)
     % Main function to parse DOF file and plot obstacles on a MATLAB map
 
     % Replace with the actual path to your DOF file
@@ -8,8 +8,43 @@ function object_data_parser(p_lat, p_lon, a_agl)
     % Parse the DOF file
     obstacles = parse_dof_file(dof_filename);
     
-    % Create the obstacle map
-    create_obstacle_map(obstacles, p_lat, p_lon, a_agl);
+    % Initialize the map update timer
+    mapUpdateTimer = initialize_map_update_timer();
+
+    % Create the obstacle map with rate-limited updates
+    rate_limited_update(mapUpdateTimer, obstacles, p_lat, p_lon, a_agl);
+end
+
+function mapUpdateTimer = initialize_map_update_timer()
+    % Initializes the timer for rate-limiting map updates
+    mapUpdateTimer = timer('ExecutionMode', 'singleShot', ...
+                           'StartDelay', 0.5, ... % Adjust delay as needed
+                           'TimerFcn', @(~, ~) execute_map_update());
+end
+
+function rate_limited_update(mapUpdateTimer, obstacles, p_lat, p_lon, a_agl)
+    % Intermediary function to rate-limit map updates
+    persistent updateData;
+
+    % Store the latest data for the update
+    updateData.obstacles = obstacles;
+    updateData.p_lat = p_lat;
+    updateData.p_lon = p_lon;
+    updateData.a_agl = a_agl;
+
+    % Start or restart the timer
+    if strcmp(mapUpdateTimer.Running, 'off')
+        start(mapUpdateTimer);
+    end
+
+    % Nested function to execute the map update
+    function execute_map_update()
+        % Executes the map update with the latest data
+        if ~isempty(updateData)
+            % Call the map update function with the latest data
+            create_obstacle_map(updateData.obstacles, updateData.p_lat, updateData.p_lon, updateData.a_agl);
+        end
+    end
 end
 
 function plot_plane_path(p_lat, p_lon)
