@@ -139,7 +139,7 @@ function create_obstacle_map(obstacles, p_lat, p_lon, a_agl)
     lons = [];
     labels = {};
 
-    radius = 0.1; % Flat radius in degrees (approx. 30-40 miles depending on latitude)
+    radius = 0.1; % Flat radius in degrees (1 latitude = approx. 30-40 miles depending on latitude)
 
     for i = 1:length(obstacles)
         obs = obstacles(i);
