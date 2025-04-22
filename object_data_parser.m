@@ -18,8 +18,7 @@ end
 function mapUpdateTimer = initialize_map_update_timer()
     % Initializes the timer for rate-limiting map updates
     mapUpdateTimer = timer('ExecutionMode', 'singleShot', ...
-                           'StartDelay', 0.5, ... % Adjust delay as needed
-                           'TimerFcn', @(~, ~) execute_map_update());
+                           'StartDelay', 0.5); % Adjust delay as needed
 end
 
 function rate_limited_update(mapUpdateTimer, obstacles, p_lat, p_lon, a_agl)
@@ -32,18 +31,20 @@ function rate_limited_update(mapUpdateTimer, obstacles, p_lat, p_lon, a_agl)
     updateData.p_lon = p_lon;
     updateData.a_agl = a_agl;
 
+    % Set the TimerFcn dynamically to access the latest updateData
+    mapUpdateTimer.TimerFcn = @(~, ~) execute_map_update(updateData);
+
     % Start or restart the timer
     if strcmp(mapUpdateTimer.Running, 'off')
         start(mapUpdateTimer);
     end
+end
 
-    % Nested function to execute the map update
-    function execute_map_update()
-        % Executes the map update with the latest data
-        if ~isempty(updateData)
-            % Call the map update function with the latest data
-            create_obstacle_map(updateData.obstacles, updateData.p_lat, updateData.p_lon, updateData.a_agl);
-        end
+function execute_map_update(updateData)
+    % Executes the map update with the latest data
+    if ~isempty(updateData)
+        % Call the map update function with the latest data
+        create_obstacle_map(updateData.obstacles, updateData.p_lat, updateData.p_lon, updateData.a_agl);
     end
 end
 
@@ -132,21 +133,21 @@ function record = parse_dof_line(line)
     record.country_id = strtrim(line(13:14));
     record.state_id = strtrim(line(16:17));
     record.city_name = strtrim(line(19:34));
-    record.lat_deg = str2double(strtrim(line(36:37)));
-    record.lat_min = str2double(strtrim(line(39:40)));
-    record.lat_sec = str2double(strtrim(line(42:46)));
+    record.lat_deg = str2double(strtrim(line(36:37));
+    record.lat_min = str2double(strtrim(line(39:40));
+    record.lat_sec = str2double(strtrim(line(42:46));
     record.lat_hem = strtrim(line(47));
-    record.lon_deg = str2double(strtrim(line(49:51)));
-    record.lon_min = str2double(strtrim(line(53:54)));
-    record.lon_sec = str2double(strtrim(line(56:60)));
+    record.lon_deg = str2double(strtrim(line(49:51));
+    record.lon_min = str2double(strtrim(line(53:54));
+    record.lon_sec = str2double(strtrim(line(56:60));
     record.lon_hem = strtrim(line(61));
     record.obstacle_type = strtrim(line(63:80));
-    record.quantity = str2double(strtrim(line(82)));
-    record.agl_height = str2double(strtrim(line(84:88)));
-    record.amsl_height = str2double(strtrim(line(90:94)));
+    record.quantity = str2double(strtrim(line(82));
+    record.agl_height = str2double(strtrim(line(84:88));
+    record.amsl_height = str2double(strtrim(line(90:94));
     record.lighting = strtrim(line(96));
-    record.horizontal_accuracy = str2double(strtrim(line(98)));
-    record.vertical_accuracy = str2double(strtrim(line(100)));
+    record.horizontal_accuracy = str2double(strtrim(line(98));
+    record.vertical_accuracy = str2double(strtrim(line(100));
     record.mark_indicator = strtrim(line(102));
     record.faa_study_number = strtrim(line(104:117));
     record.action = strtrim(line(119));
